@@ -32,8 +32,66 @@
       </div>
     </div>
     <script type="text/javascript">
-      const apiUrl="https://api.nam.icu/v1/conversation",chatId=generateUUIDv4();let chatData=[];const questionTemplate='\n\n\t\t\t\t\t\t\t\t\t<div class="d-flex flex-row pt-1">\n\t\t\t\t\t\t\t\t\t\t<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="avatar 1" style="width: 45px; height: 100%;">\n\t\t\t\t\t\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t\t\t\t\t\t<p class="small p-2 ms-3 mb-3 rounded-3 bg-info">#QUESTION#</p>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>',answerTemplate='\n\n\t\t\t\t\t\t\t\t\t\t<div id="##LOADING##" class="d-flex flex-row">\n\t\t\t\t\t\t\t\t\t\t\t<img src="https://avatars.githubusercontent.com/u/33565557?v=4" alt="avatar 1" style="width: 45px; height: 100%;">\n\t\t\t\t\t\t\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">##ANSWER##</p>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>',messageContainer=document.querySelector(".card-body"),inputField=document.querySelector("input");function sendMessage(t){inputField.setAttribute("disabled",!0),document.querySelector("#sendM").setAttribute("disabled",!0);const e=questionTemplate.replace("#QUESTION#",t);messageContainer.insertAdjacentHTML("beforeend",e);const n=answerTemplate.replace("#DATETIME#",(new Date).toLocaleTimeString()).replace("##ANSWER##","Loading...").replace("##LOADING##","loadingnya");messageContainer.insertAdjacentHTML("beforeend",n);const a={chat_id:chatId,prompt:t,chat_data:JSON.stringify(chatData)},s=new URLSearchParams;for(const t in a)s.append(t,a[t]);fetch(apiUrl,{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:s}).then(t=>t.json()).then(e=>{chatData.push({question:t,answer:e.answer});let n=e.answer.replace(/<\?php/g,"&lt;?php").replace(/ < /g,"&lt;").replace(/ > /g,"&gt;"),a=answerTemplate.replace("#DATETIME#",(new Date).toLocaleTimeString()).replace("##ANSWER##",n);if(-1!==n.indexOf("```")){const t=/```\n?([\s\S]*?)```\n?([\s\S]*?)$/gs.exec(a);if(t){const[,e,n]=t;a=a.replace(/```\n?([\s\S]*?)```\n?([\s\S]*?)$/gs,`\n\t\t\t\t\t\t\t\t\t\t<pre class="p-2 ms-3 hljs">\n\t\t\t\t\t\t\t\t\t\t\t<code class="language-cpp">${e}</code>\n\t\t\t\t\t\t\t\t\t\t</pre>${n?`\n\t\t\t\t\t\t\t\t\t\t<p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">${n}</p>`:""}`)}}const s=document.getElementById("loadingnya");s.parentNode.removeChild(s),messageContainer.insertAdjacentHTML("beforeend",a),hljs.highlightAll(),inputField.removeAttribute("disabled"),document.querySelector("#sendM").removeAttribute("disabled"),messageContainer.scrollTop=messageContainer.scrollHeight-messageContainer.clientHeight,inputField.focus()}).catch(t=>{console.error(t)})}function generateUUIDv4(){return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(t){const e=16*Math.random()|0;return("x"==t?e:3&e|8).toString(16)})}inputField.addEventListener("keydown",t=>{if("Enter"===t.key){sendMessage(inputField.value),inputField.value="",messageContainer.scrollTop=messageContainer.scrollHeight-messageContainer.clientHeight}});
-    </script>
+      const apiUrl = "https://api.nam.icu/v2/beta/conversation",
+          chatId = generateUUIDv4();
+      let chatData = [];
+      const questionTemplate = '\n\n\t\t\t\t\t\t\t\t\t<div class="d-flex flex-row pt-1">\n\t\t\t\t\t\t\t\t\t\t<img src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="avatar 1" style="width: 45px; height: 100%;">\n\t\t\t\t\t\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t\t\t\t\t\t<p class="small p-2 ms-3 mb-3 rounded-3 bg-info">#QUESTION#</p>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</div>',
+          answerTemplate = '\n\n\t\t\t\t\t\t\t\t\t\t<div id="##LOADING##" class="d-flex flex-row">\n\t\t\t\t\t\t\t\t\t\t\t<img src="https://avatars.githubusercontent.com/u/33565557?v=4" alt="avatar 1" style="width: 45px; height: 100%;">\n\t\t\t\t\t\t\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">##ANSWER##</p>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>',
+          messageContainer = document.querySelector(".card-body"),
+          inputField = document.querySelector("input");
+
+      function sendMessage(t) {
+          inputField.setAttribute("disabled", !0), document.querySelector("#sendM").setAttribute("disabled", !0);
+          const e = questionTemplate.replace("#QUESTION#", t);
+          messageContainer.insertAdjacentHTML("beforeend", e);
+          const n = answerTemplate.replace("#DATETIME#", (new Date).toLocaleTimeString()).replace("##ANSWER##", "Loading...").replace("##LOADING##", "loadingnya");
+          messageContainer.insertAdjacentHTML("beforeend", n);
+          const a = {
+                  chat_id: chatId,
+                  prompt: t,
+                  chat_data: JSON.stringify(chatData)
+              },
+              s = new URLSearchParams;
+          for (const t in a) s.append(t, a[t]);
+          fetch(apiUrl, {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/x-www-form-urlencoded"
+              },
+              body: s
+          }).then(t => t.json()).then(e => {
+              chatData.push({
+                  question: t,
+                  answer: e.answer
+              });
+              let n = e.answer,
+                  a = answerTemplate.replace("#DATETIME#", (new Date).toLocaleTimeString()).replace("##ANSWER##", n);
+              if (-1 !== n.indexOf("```")) {
+                  const t = /```\n?([\s\S]*?)```\n?([\s\S]*?)$/gs.exec(a);
+                  if (t) {
+                      const [, e, n] = t;
+                      a = a.replace(/```\n?([\s\S]*?)```\n?([\s\S]*?)$/gs, `<pre class="p-2 ms-3 hljs"><code class="language-cpp">${e}</code></pre>${n?`<p class="small p-2 ms-3 mb-3 rounded-3" style="background-color: #f5f6f7;">${n}</p>`:""}`)
+                  }
+              }
+              const s = document.getElementById("loadingnya");
+              s.parentNode.removeChild(s), messageContainer.insertAdjacentHTML("beforeend", a), hljs.highlightAll(), inputField.removeAttribute("disabled"), document.querySelector("#sendM").removeAttribute("disabled"), messageContainer.scrollTop = messageContainer.scrollHeight - messageContainer.clientHeight, inputField.focus()
+          }).catch(t => {
+              console.error(t)
+          })
+      }
+
+      function generateUUIDv4() {
+          return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(t) {
+              const e = 16 * Math.random() | 0;
+              return ("x" == t ? e : 3 & e | 8).toString(16)
+          })
+      }
+      inputField.addEventListener("keydown", t => {
+          if ("Enter" === t.key) {
+              sendMessage(inputField.value), inputField.value = "", messageContainer.scrollTop = messageContainer.scrollHeight - messageContainer.clientHeight
+          }
+      });
+      </script>
 
   </body>
 </html>
